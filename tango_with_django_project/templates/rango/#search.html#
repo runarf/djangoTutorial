@@ -1,0 +1,33 @@
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block body_block %}
+  <h1>Search for a page</h1>
+  <br />
+
+  <div class="container-fluid">
+    <form class="form-signin span8" id="user_form" method="post" action="/rango/category/{{ category_name_url }}/">
+      {% csrf_token %}
+
+      <input type="text" size="50" name="query" value="" id="query" />
+      <input class="btn btn-primary" type="submit" name="submit" value="Search" />
+      <br />
+    </form>
+  </div>
+
+  <div class="container-fluid">
+    {% if result_list %}
+      <ol>
+	{% for result in result_list %}
+	  <li>
+	    <strong><a href="{{ result.link }}">{{ result.title }}</a></strong><br />
+	    <p>{{ result.summary }}</p>
+	  </li>
+	{% endfor %}
+      </ol>
+      {% else %}
+      <p>No results found</p>
+    {% endif %}
+  </div>
+{% endblock %}

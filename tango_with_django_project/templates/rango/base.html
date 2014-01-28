@@ -28,6 +28,7 @@
 	    <ul class="nav pull-right">
 	      {% if user.is_authenticated %}
 		<li class="navbar-text">Welcome, {{ user.username }}!</li>
+		<li><a href="/rango/profile/">Profile</a></li>
 		<li><a href="/rango/logout/">Logout</a></li>
 	      {% else %}
 		<li><a href="/rango/register/">Register</a></li>
@@ -39,8 +40,7 @@
 		<li><a href="/rango/restricted/">Restricted</a></li>
 		<li><a href="/rango/add_category/">Add Category</a></li>
 	      {% endif %}
-		<li><a href="/rango/about/">About</a></li>
-		<!--<li><a href="/rango/">Back to start!</a></li>-->
+	      <li><a href="/rango/about/">About</a></li>
 	    </ul>
 	  </div>
 	</div>
@@ -50,21 +50,29 @@
       <div class="row-fluid">
 	<div class="span3">
 	  <div class="well sidebar-nav">
+	    {% block sidebar %}
+	    {% endblock %}
+	    <div id="cats">
+	      {% if cat_list %}
+		<ul class="nav nav-list"><li>Category list</li></ul>
+		{% include "rango/category_list.html" with cat_list=cat_list %}
+	      {% endif %}
+	    </div>
 	  </div>
 	</div>
 	<div class="span9">
 	  {% block body_block %}
-	    {% endblock %}
+	  {% endblock %}
 	</div>
       </div>
     </div>
-      <hr>
-      <footer>
-	<div class="container">
-	  <p>&copy; Rango: How to Tango with Django 2014</p>
-	</div>
-      </footer>
-    <script src="{% static 'js/jquery-2.0.3.min.js' %}> </script>
+    <hr>
+    <footer>
+      <div class="container">
+	<p>&copy; Rango: How to Tango with Django 2014</p>
+      </div>
+    </footer>
+    <script src="{% static 'js/jquery-2.0.3.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
   </body>
 </html>
