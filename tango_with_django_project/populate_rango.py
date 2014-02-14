@@ -5,29 +5,29 @@ def populate():
 
     add_page(cat=python_cat,
         title="Official Python Tutorial",
-             url="http://docs.python.org/2/tutorial/", views=31)
+        url="http://docs.python.org/2/tutorial/")
 
     add_page(cat=python_cat,
         title="How to Think like a Computer Scientist",
-             url="http://www.greenteapress.com/thinkpython/", views=23)
+        url="http://www.greenteapress.com/thinkpython/")
 
     add_page(cat=python_cat,
         title="Learn Python in 10 Minutes",
-             url="http://www.korokithakis.net/tutorials/python/", views=41)
+        url="http://www.korokithakis.net/tutorials/python/")
 
     django_cat = add_cat("Django", views=64, likes=32)
 
     add_page(cat=django_cat,
         title="Official Django Tutorial",
-             url="https://docs.djangoproject.com/en/1.5/intro/tutorial01/", views=13)
+        url="https://docs.djangoproject.com/en/1.5/intro/tutorial01/")
 
     add_page(cat=django_cat,
         title="Django Rocks",
-             url="http://www.djangorocks.com/", views=39)
+        url="http://www.djangorocks.com/")
 
     add_page(cat=django_cat,
         title="How to Tango with Django",
-             url="http://www.tangowithdjango.com/", views=919)
+        url="http://www.tangowithdjango.com/")
 
     frame_cat = add_cat("Other Frameworks", views=32, likes=16)
 
@@ -49,7 +49,7 @@ def add_page(cat, title, url, views=0):
     return p
 
 def add_cat(name, views=0, likes=0):
-    c = Category.objects.get_or_create(name=name, views=views, likes=likes)[0]
+    c = Category.objects.get_or_create(name=name,views=views,likes=likes)[0]
     return c
 
 # Start execution here!
