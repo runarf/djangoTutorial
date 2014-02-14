@@ -12,8 +12,16 @@ from rango.bing_search import run_query
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 
-def get_category_list ():
-    cat_list = Category.objects.all ()
+def get_category_list (max_results=0, starts_with=''):
+    cat_list = []
+    if starts_with:
+        cat_list = Category.objects.filter (name__istartswith=starts_with)
+    else:
+        cat_list = Category.objects.all ()
+
+    if max_results > 0:
+        if len(cat_list) > max_results:
+            cat_list = cat_list[:max_results]
 
     for cat in cat_list:
         cat.url = encode_url (cat.name)
@@ -25,6 +33,20 @@ def encode_url (category_name_url):
 
 def decode_url (category_name_url):
     return category_name_url.replace('_', ' ')
+
+def suggest_category (request):
+    context = RequestContext(request)
+    cat_list = []
+    starts_with = ''
+    if request.method == 'GET':
+        starts_with = request.GET['suggestion']
+
+    cat_list = get_category_list(8, starts_with)
+
+    return render_to_response ('rango/category_list.html',
+                                {'cat_list': cat_list},
+                                context)
+
 
 @login_required
 def restricted (request):
@@ -63,7 +85,7 @@ def category (request, category_name_url):
 
     
     try:
-        category = Category.objects.get(name=category_name)
+        category = Category.objects.get(name__iexact=category_name)
 
         pages = Page.objects.filter (category=category).order_by ('-views')
 
@@ -75,16 +97,32 @@ def category (request, category_name_url):
         pass
 
     if request.method == 'POST':
-        query = request.POST ['query'].strip()
-
+        query = request.POST.get('query')
         if query:
+            query = query.strip()
             result_list = run_query (query)
             context_dict['result_list'] = result_list
         
     return render_to_response('rango/category.html', context_dict, context)
 
 
+@login_required
+def like_category (request):
+    context = RequestContext (request)
+    cat_id = None
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
 
+    likes = 0
+    if cat_id:
+        category = Category.objects.get (id=int(cat_id))
+        if category:
+            likes = category.likes + 1
+            category.likes = likes
+            category.save ()
+
+    return HttpResponse (likes)
+    
 def index(request):
     context = RequestContext (request)
     category_list = Category.objects.order_by ('-likes')[:5]
@@ -140,6 +178,25 @@ def add_category (request):
     context_dict['form'] = form
     return render_to_response ('rango/add_category.html', context_dict, context)
 
+@login_required
+def auto_add_page (request):
+    context = RequestContext (request)
+    cat_id = None
+    url = None
+    title = None
+    context_dict = {}
+    if request.method == 'GET':
+        cat_id = request.GET['category_id']
+        url = request.GET['url']
+        title = request.GET['title']
+        if cat_id:
+            category = Category.objects.get(id=int(cat_id))
+            print title
+            p = Page.objects.get_or_create(category=category, title=title, url=url)
+            pages = Page.object.filter(category=category).order_by('-views')
+            context_dict['pages'] = pages
+
+    return render_to_response ('rango/page_list.html', context_dict, context)
 
 @login_required
 def add_page (request, category_name_url):
@@ -243,10 +300,10 @@ def user_login (request):
 
             if user.is_active:
                 login (request, user)
-                return render_to_response('rango/index.html',
-                                          context_dict,
-                                          context)
-                #return HttpResponseRedirect ('/rango/')
+                #return render_to_response('rango/index.html',
+                                          #context_dict,
+                                          #context)
+                return HttpResponseRedirect ('/rango/')
             else:
                 return HttpResponse ("Your Rango account is disabled.")
 
